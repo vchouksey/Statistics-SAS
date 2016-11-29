@@ -1,4 +1,4 @@
-LIBNAME sas '/folders/myfolders/week1/';
+LIBNAME sas '/folders/myfolders/week2/';
 DATA data;
 SET sas.iq;
 RUN;
