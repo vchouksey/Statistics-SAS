@@ -8,6 +8,7 @@ var PPM;
 by Site;
 run;
 
+/* One-Sample t Test */
 ods graphics on;
 proc ttest h0=80 plots(showh0) sides=u alpha=0.1;
 var PPM;
