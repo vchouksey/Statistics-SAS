@@ -2,17 +2,22 @@ LIBNAME A1 '/folders/myfolders/Assignment 1/';
 DATA dataset;
 	SET A1.assignmentdata;
 	ID = _n_;
-	i=1;
 RUN;
 
 PROC UNIVARIATE DATA=dataset outtable=univariatedetails;
 	VAR ppm;
-	by i;
+	class Site;
+	class Sensor;
 RUN;
+
+PROC SORT DATA=dataset;
+	By Site Sensor;
+RUN;
+
 
 data mergeddataset;
 	merge dataset univariatedetails;
-	by i;
+	by Site Sensor;
 run;
 
 DATA mergeddataset;
@@ -22,7 +27,7 @@ DATA mergeddataset;
 RUN;
 
 PROC SORT DATA=mergeddataset;
-	BY ppm;
+	BY Site Sensor;
 RUN;
 
 DATA mergeddataset;
@@ -31,15 +36,21 @@ DATA mergeddataset;
 		ELSE OUTLIER=0;
 RUN;
 
+DATA Tukey_Outlier;
+	SET mergeddataset;
+	if outlier = 1 then output;
+run;
+
+
 
 /*Outlier detection using BOXPLOT*/
 DATA TUKEY;
 	SET dataset;
-	GROUP=1;
+	BY Site;
 RUN;
 
 PROC BOXPLOT DATA=TUKEY;
-   PLOT  ppm*group/boxstyle = schematicid;
+   PLOT  ppm/boxstyle = schematicid;
    ID id;
 RUN;QUIT;
 
