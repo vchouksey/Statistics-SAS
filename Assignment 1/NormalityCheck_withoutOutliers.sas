@@ -36,14 +36,47 @@ proc sort data=dataset_without_outliers;
 	by Site Sensor;
 run;
 
-Title 'Normality Testing';
-proc univariate data=dataset_without_outliers normal;
-	var PPM;
+data site_before;
+	set dataset_without_outliers;
+	if (Site = 'Before') then output;
+run;
+DATA site_before;
+	SET site_before;
+	LOGPPM = LOG(PPM);
+RUN;
+
+proc sort data=site_before;
 	by Site Sensor;
-	histogram PPM;
-	probplot PPM;
+run;
+
+Title 'Normality Testing';
+proc univariate data=site_before normal;
+	var PPM LOGPPM;
+	by Site Sensor;
+	histogram PPM LOGPPM/normal;
+	probplot PPM LOGPPM/normal;
 	ods output TestsForNormality=NORMALITYTEST;
 run;
 
-proc print data=dataset_without_outliers;
-run;
+*ods rtf file='temp.rtf';
+PROC PRINT DATA=NORMALITYTEST;
+RUN;
+*ods rtf close;
+
+/*  */
+/* Title 'Perform D�Agostino test'; */
+/* PROC RANK DATA=site_before OUT=RANKS; */
+/* 	VAR LOGPPM; */
+/* 	RANKS K; */
+/* RUN; */
+/*  */
+/* DATA DAgos; */
+/* 	SET RANKS; */
+/* 	S = 0.078997; */
+/* 	N = 20; */
+/* 	D_YK = LOGPPM*(K - 0.5*(N+1))/(S*SQRT(N**3*(N-1))); */
+/* RUN; */
+/*  */
+/* PROC MEANS DATA=DAgos SUM; */
+/* 	VAR D_YK; */
+/* RUN; */
