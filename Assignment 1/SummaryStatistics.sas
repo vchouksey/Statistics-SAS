@@ -10,8 +10,9 @@ run;
 
 /* calc means of dataset */
 Title 'Summary Statistics';
-proc means data=dataset mean std var n;
-	class Site Sensor;
+proc means data=dataset n min max mean median std var;
+/* 	class Site Sensor; */
+	class Site;
 	var PPM;
 	output out=meansdetails mean=mean std=sd var=var n=n;
 run;
